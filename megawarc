@@ -258,14 +258,20 @@ class MegawarcBuilder(object):
   def process(self):
     with open(self.output_warc_filename, "wb") as warc_out:
       with open(self.output_tar_filename, "wb") as tar_out:
-        with gzip.open(self.output_json_filename, "wb") as json_out:
-          with tarfile.open(self.input_filename, "r") as tar:
+        json_out = gzip.open(self.output_json_filename, "wb")
+        try:
+          tar = tarfile.open(self.input_filename, "r")
+          try:
             for tarinfo in tar:
               self.process_entry(tarinfo, warc_out, tar_out, json_out)
 
             padding = (tarfile.RECORDSIZE - tar_out.tell()) % tarfile.RECORDSIZE
             if padding > 0:
               tar_out.write("\0" * padding)
+          finally:
+            tar.close()
+        finally:
+          json_out.close()
 
   def process_entry(self, entry, warc_out, tar_out, json_out):
     with open(self.input_filename, "r") as tar:
@@ -342,7 +348,8 @@ class MegawarcPacker(object):
   def process(self, filelist):
     with open(self.output_warc_filename, "wb") as warc_out:
       with open(self.output_tar_filename, "wb") as tar_out:
-        with gzip.open(self.output_json_filename, "wb") as json_out:
+        json_out = gzip.open(self.output_json_filename, "wb")
+        try:
           def each_file(arg, dirname, names):
             for n in names:
               n = os.path.join(dirname, n)
@@ -358,6 +365,8 @@ class MegawarcPacker(object):
           padding = (tarfile.RECORDSIZE - tar_out.tell()) % tarfile.RECORDSIZE
           if padding > 0:
             tar_out.write("\0" * padding)
+        finally:
+          json_out.close()
 
   def process_file(self, filename, warc_out, tar_out, json_out):
     # make tar header
@@ -453,7 +462,8 @@ class MegawarcRestorer(object):
     self.input_json_filename = output_filename + ".megawarc.json.gz"
 
   def process(self):
-    with gzip.open(self.input_json_filename, "rb") as json_in:
+    json_in = gzip.open(self.input_json_filename, "rb")
+    try:
       with open(self.output_filename, "wb") as tar_out:
         for line in json_in:
           entry = json.loads(line)
@@ -462,6 +472,8 @@ class MegawarcRestorer(object):
         padding = (tarfile.RECORDSIZE - tar_out.tell()) % tarfile.RECORDSIZE
         if padding > 0:
           tar_out.write("\0" * padding)
+    finally:
+      json_in.close()
 
 
   def process_entry(self, entry, tar_out):
