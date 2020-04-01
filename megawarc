@@ -435,8 +435,9 @@ class MegawarcPacker(object):
     elif filename.endswith(".gz"):
       dict_id = None
       if "gz" not in self.megawarcs:
+        base = self.output_basename
         self.megawarcs["gz"] = {
-          "warc": {"file": open(base + ".megawarc.warc.zst", "wb")},
+          "warc": {"file": open(base + ".megawarc.warc.gz", "wb")},
           "json": {"file": gzip.open(base + ".megawarc.json.gz", "wb")},
           "tar": {
             "file": open(base + ".megawarc.tar", "wb"),
