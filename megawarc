@@ -429,6 +429,7 @@ class MegawarcPacker(object):
           init_zst_megawarc(self.megawarcs[dict_id]["warc"]["file"], project,
                             dict_id, self.dict_server)
         )
+        self.megawarcs[dict_id]["dict"]["file"].flush()
       json_out = self.megawarcs[dict_id]["json"]["file"]
       warc_out = self.megawarcs[dict_id]["warc"]["file"]
       tar_out = self.megawarcs[dict_id]["tar"]
