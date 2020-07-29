@@ -412,6 +412,7 @@ class MegawarcPacker(object):
     if filename.endswith(".zst"):
       find = re.search(r"\.([0-9a-zA-Z]+)\.([0-9]{10})\.warc\.zst$", filename)
       if not find:
+        print filename
         raise ValueError("Bad ZST WARC filename.")
       project, dict_id = find.groups()
       if dict_id not in self.megawarcs:
